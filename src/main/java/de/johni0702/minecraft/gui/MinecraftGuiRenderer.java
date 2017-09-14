@@ -29,16 +29,25 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.*;
+import org.lwjgl.util.Color;
+import org.lwjgl.util.Point;
+import org.lwjgl.util.ReadableColor;
+import org.lwjgl.util.ReadableDimension;
+import org.lwjgl.util.ReadablePoint;
+import org.lwjgl.util.WritableDimension;
 
-import static net.minecraft.client.renderer.GlStateManager.*;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_ALPHA_TEST;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_FLAT;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SMOOTH;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 
 public class MinecraftGuiRenderer implements GuiRenderer {
 
@@ -92,7 +101,7 @@ public class MinecraftGuiRenderer implements GuiRenderer {
 
     @Override
     public void bindTexture(ITextureObject texture) {
-        GlStateManager.bindTexture(texture.getGlTextureId());
+        GL11.glBindTexture(GL_TEXTURE_2D, texture.getGlTextureId());
     }
 
     @Override
@@ -102,15 +111,15 @@ public class MinecraftGuiRenderer implements GuiRenderer {
 
     @Override
     public void drawTexturedRect(int x, int y, int u, int v, int width, int height, int uWidth, int vHeight, int textureWidth, int textureHeight) {
-        GlStateManager.color(1, 1, 1);
+        GL11.glColor3f(1, 1, 1);
         Gui.drawScaledCustomSizeModalRect(x, y, u, v, uWidth, vHeight, width, height, textureWidth, textureHeight);
     }
 
     @Override
     public void drawRect(int x, int y, int width, int height, int color) {
         Gui.drawRect(x, y, x + width, y + height, color);
-        GlStateManager.color(1, 1, 1);
-        enableBlend();
+        GL11.glColor3f(1, 1, 1);
+        GL11.glEnable(GL_BLEND);
     }
 
     @Override
@@ -125,13 +134,12 @@ public class MinecraftGuiRenderer implements GuiRenderer {
 
     @Override
     public void drawRect(int x, int y, int width, int height, ReadableColor tl, ReadableColor tr, ReadableColor bl, ReadableColor br) {
-        disableTexture2D();
-        enableBlend();
-        disableAlpha();
-        tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        shadeModel(GL_SMOOTH);
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer renderer = tessellator.getWorldRenderer();
+        GL11.glDisable(GL_TEXTURE_2D);
+        GL11.glEnable(GL_BLEND);
+        GL11.glDisable(GL_ALPHA_TEST);
+        OpenGlHelper.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        GL11.glShadeModel(GL_SMOOTH);
+        Tessellator renderer = Tessellator.instance;
         renderer.startDrawingQuads();
         renderer.setColorRGBA(bl.getRed(), bl.getGreen(), bl.getBlue(), bl.getAlpha());
         renderer.addVertex(x, y + height, 0);
@@ -141,10 +149,10 @@ public class MinecraftGuiRenderer implements GuiRenderer {
         renderer.addVertex(x + width, y, 0);
         renderer.setColorRGBA(tl.getRed(), tl.getGreen(), tl.getBlue(), tl.getAlpha());
         renderer.addVertex(x, y, 0);
-        tessellator.draw();
-        shadeModel(GL_FLAT);
-        enableAlpha();
-        enableTexture2D();
+        renderer.draw();
+        GL11.glShadeModel(GL_FLAT);
+        GL11.glEnable(GL_ALPHA_TEST);
+        GL11.glEnable(GL_TEXTURE_2D);
     }
 
     @Override
@@ -171,7 +179,7 @@ public class MinecraftGuiRenderer implements GuiRenderer {
     public int drawString(int x, int y, int color, String text, boolean shadow) {
         FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
         int ret = shadow ? fontRenderer.drawStringWithShadow(text, x, y, color) : fontRenderer.drawString(text, x, y, color);
-        GlStateManager.color(1, 1, 1);
+        GL11.glColor3f(1, 1, 1);
         return ret;
     }
 

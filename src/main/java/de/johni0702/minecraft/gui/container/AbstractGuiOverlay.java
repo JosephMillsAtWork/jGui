@@ -24,12 +24,20 @@
  */
 package de.johni0702.minecraft.gui.container;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import de.johni0702.minecraft.gui.GuiRenderer;
 import de.johni0702.minecraft.gui.MinecraftGuiRenderer;
 import de.johni0702.minecraft.gui.OffsetGuiRenderer;
 import de.johni0702.minecraft.gui.RenderInfo;
 import de.johni0702.minecraft.gui.element.GuiElement;
-import de.johni0702.minecraft.gui.function.*;
+import de.johni0702.minecraft.gui.function.Clickable;
+import de.johni0702.minecraft.gui.function.Closeable;
+import de.johni0702.minecraft.gui.function.Draggable;
+import de.johni0702.minecraft.gui.function.Loadable;
+import de.johni0702.minecraft.gui.function.Scrollable;
+import de.johni0702.minecraft.gui.function.Tickable;
+import de.johni0702.minecraft.gui.function.Typeable;
 import de.johni0702.minecraft.gui.utils.MouseUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -38,15 +46,12 @@ import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.ReportedException;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.Dimension;
 import org.lwjgl.util.Point;
 import org.lwjgl.util.ReadableDimension;
 import org.lwjgl.util.ReadablePoint;
 
-import java.io.IOException;
 import java.util.concurrent.Callable;
 
 public abstract class AbstractGuiOverlay<T extends AbstractGuiOverlay<T>> extends AbstractGuiContainer<T> {
@@ -196,8 +201,11 @@ public abstract class AbstractGuiOverlay<T extends AbstractGuiOverlay<T>> extend
         return screenSize;
     }
 
-    private class EventHandler {
+    // Event handlers need to be public in 1.7.10
+    public class EventHandler {
         private MinecraftGuiRenderer renderer;
+
+        private EventHandler() {}
 
         @SubscribeEvent
         public void renderOverlay(RenderGameOverlayEvent.Post event) {
@@ -242,7 +250,7 @@ public abstract class AbstractGuiOverlay<T extends AbstractGuiOverlay<T>> extend
         }
 
         @Override
-        protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        protected void keyTyped(char typedChar, int keyCode) {
             forEach(Typeable.class).typeKey(MouseUtils.getMousePos(), keyCode, typedChar, isCtrlKeyDown(), isShiftKeyDown());
             if (closeable) {
                 super.keyTyped(typedChar, keyCode);
@@ -250,7 +258,7 @@ public abstract class AbstractGuiOverlay<T extends AbstractGuiOverlay<T>> extend
         }
 
         @Override
-        protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+        protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
             forEach(Clickable.class).mouseClick(new Point(mouseX, mouseY), mouseButton);
         }
 
@@ -270,7 +278,7 @@ public abstract class AbstractGuiOverlay<T extends AbstractGuiOverlay<T>> extend
         }
 
         @Override
-        public void handleMouseInput() throws IOException {
+        public void handleMouseInput() {
             super.handleMouseInput();
             if (Mouse.hasWheel() && Mouse.getEventDWheel() != 0) {
                 forEach(Scrollable.class).scroll(MouseUtils.getMousePos(), Mouse.getEventDWheel());

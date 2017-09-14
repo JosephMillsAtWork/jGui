@@ -31,13 +31,15 @@ import de.johni0702.minecraft.gui.function.Clickable;
 import lombok.Getter;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.Dimension;
 import org.lwjgl.util.Point;
 import org.lwjgl.util.ReadableDimension;
 
+import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 
@@ -60,7 +62,7 @@ public abstract class AbstractGuiButton<T extends AbstractGuiButton<T>> extends 
         super.draw(renderer, size, renderInfo);
 
         renderer.bindTexture(WIDGETS_TEXTURE);
-        GlStateManager.color(1, 1, 1, 1);
+        GL11.glColor4f(1, 1, 1, 1);
 
         byte texture = 1;
         int color = 0xe0e0e0;
@@ -72,9 +74,9 @@ public abstract class AbstractGuiButton<T extends AbstractGuiButton<T>> extends 
             color = 0xffffa0;
         }
 
-        GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glEnable(GL_BLEND);
+        OpenGlHelper.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         int textureY = 46 + texture * 20;
         int halfWidth = size.getWidth() / 2;
@@ -93,7 +95,7 @@ public abstract class AbstractGuiButton<T extends AbstractGuiButton<T>> extends 
 
     @Override
     public void onClick() {
-        getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.create(BUTTON_SOUND, 1.0F));
+        getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.createPositionedSoundRecord(BUTTON_SOUND, 1.0F));
         super.onClick();
     }
 

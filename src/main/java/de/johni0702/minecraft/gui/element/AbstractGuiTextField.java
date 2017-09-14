@@ -39,7 +39,6 @@ import lombok.NonNull;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ChatAllowedCharacters;
 import org.lwjgl.input.Keyboard;
@@ -51,12 +50,6 @@ import org.lwjgl.util.ReadableColor;
 import org.lwjgl.util.ReadableDimension;
 import org.lwjgl.util.ReadablePoint;
 
-import static net.minecraft.client.renderer.GlStateManager.color;
-import static net.minecraft.client.renderer.GlStateManager.colorLogicOp;
-import static net.minecraft.client.renderer.GlStateManager.disableColorLogic;
-import static net.minecraft.client.renderer.GlStateManager.disableTexture2D;
-import static net.minecraft.client.renderer.GlStateManager.enableColorLogic;
-import static net.minecraft.client.renderer.GlStateManager.enableTexture2D;
 import static net.minecraft.util.MathHelper.clamp_int;
 
 public abstract class AbstractGuiTextField<T extends AbstractGuiTextField<T>>
@@ -315,23 +308,21 @@ public abstract class AbstractGuiTextField<T extends AbstractGuiTextField<T>>
         bottom+=y;
         top+=y;
 
-        color(0, 0, 255, 255);
-        disableTexture2D();
-        enableColorLogic();
-        colorLogicOp(GL11.GL_OR_REVERSE);
+        GL11.glColor4f(0, 0, 255, 255);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL11.GL_COLOR_LOGIC_OP);
+        GL11.glLogicOp(GL11.GL_OR_REVERSE);
 
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer renderer = tessellator.getWorldRenderer();
+        Tessellator renderer = Tessellator.instance;
         renderer.startDrawingQuads();
         renderer.addVertex(right, top, 0);
         renderer.addVertex(left, top, 0);
         renderer.addVertex(left, bottom, 0);
         renderer.addVertex(right, bottom, 0);
-        tessellator.draw();
+        renderer.draw();
 
-        disableColorLogic();
-        enableTexture2D();
-        color(255, 255, 255, 255);
+        GL11.glDisable(GL11.GL_COLOR_LOGIC_OP);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
     }
 
     @Override

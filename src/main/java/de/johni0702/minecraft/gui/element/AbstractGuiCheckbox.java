@@ -90,7 +90,7 @@ public abstract class AbstractGuiCheckbox<T extends AbstractGuiCheckbox<T>>
 
     @Override
     public void onClick() {
-        getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.create(BUTTON_SOUND, 1.0F));
+        getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.createPositionedSoundRecord(BUTTON_SOUND, 1.0F));
         setChecked(!isChecked());
         super.onClick();
     }

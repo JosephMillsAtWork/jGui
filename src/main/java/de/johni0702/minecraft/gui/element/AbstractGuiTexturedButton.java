@@ -30,10 +30,17 @@ import de.johni0702.minecraft.gui.container.GuiContainer;
 import de.johni0702.minecraft.gui.function.Clickable;
 import lombok.Getter;
 import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.util.*;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.Dimension;
+import org.lwjgl.util.Point;
+import org.lwjgl.util.ReadableDimension;
+import org.lwjgl.util.ReadablePoint;
+import org.lwjgl.util.WritableDimension;
+import org.lwjgl.util.WritablePoint;
 
+import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 
@@ -94,13 +101,13 @@ public abstract class AbstractGuiTexturedButton<T extends AbstractGuiTexturedBut
         }
 
         if (texture == null) { // Button is disabled but we have no texture for that
-            GlStateManager.color(0.5f, 0.5f, 0.5f, 1);
+            GL11.glColor4f(0.5f, 0.5f, 0.5f, 1);
             texture = textureNormal;
         }
 
-        GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glEnable(GL_BLEND);
+        OpenGlHelper.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        GL11.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         renderer.drawTexturedRect(0, 0, texture.getX(), texture.getY(), size.getWidth(), size.getHeight(),
                 textureSize.getWidth(), textureSize.getHeight(),
@@ -114,7 +121,7 @@ public abstract class AbstractGuiTexturedButton<T extends AbstractGuiTexturedBut
 
     @Override
     public void onClick() {
-        getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.create(BUTTON_SOUND, 1.0F));
+        getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.createPositionedSoundRecord(BUTTON_SOUND, 1.0F));
         super.onClick();
     }
 

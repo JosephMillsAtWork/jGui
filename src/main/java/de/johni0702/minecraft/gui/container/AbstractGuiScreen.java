@@ -30,12 +30,17 @@ import de.johni0702.minecraft.gui.OffsetGuiRenderer;
 import de.johni0702.minecraft.gui.RenderInfo;
 import de.johni0702.minecraft.gui.element.GuiElement;
 import de.johni0702.minecraft.gui.element.GuiLabel;
-import de.johni0702.minecraft.gui.function.*;
+import de.johni0702.minecraft.gui.function.Clickable;
+import de.johni0702.minecraft.gui.function.Closeable;
+import de.johni0702.minecraft.gui.function.Draggable;
+import de.johni0702.minecraft.gui.function.Loadable;
+import de.johni0702.minecraft.gui.function.Scrollable;
+import de.johni0702.minecraft.gui.function.Tickable;
+import de.johni0702.minecraft.gui.function.Typeable;
 import de.johni0702.minecraft.gui.utils.MouseUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.ReportedException;
@@ -46,7 +51,6 @@ import org.lwjgl.util.Point;
 import org.lwjgl.util.ReadableDimension;
 import org.lwjgl.util.ReadablePoint;
 
-import java.io.IOException;
 import java.util.concurrent.Callable;
 
 public abstract class AbstractGuiScreen<T extends AbstractGuiScreen<T>> extends AbstractGuiContainer<T> {
@@ -178,11 +182,6 @@ public abstract class AbstractGuiScreen<T extends AbstractGuiScreen<T>> extends 
 
         @Override
         public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-            // The Forge loading screen apparently leaves one of the textures of the GlStateManager in an
-            // incorrect state which can cause the whole screen to just remain white. This is a workaround.
-            GlStateManager.disableTexture2D();
-            GlStateManager.enableTexture2D();
-
             int layers = getMaxLayer();
             for (int layer = 0; layer <= layers; layer++) {
                 draw(renderer, screenSize, new RenderInfo(partialTicks, mouseX, mouseY, layer));
@@ -190,7 +189,7 @@ public abstract class AbstractGuiScreen<T extends AbstractGuiScreen<T>> extends 
         }
 
         @Override
-        protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        protected void keyTyped(char typedChar, int keyCode) {
             if (!forEach(Typeable.class).typeKey(
                     MouseUtils.getMousePos(), keyCode, typedChar, isCtrlKeyDown(), isShiftKeyDown())) {
                 super.keyTyped(typedChar, keyCode);
@@ -198,7 +197,7 @@ public abstract class AbstractGuiScreen<T extends AbstractGuiScreen<T>> extends 
         }
 
         @Override
-        protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+        protected void mouseClicked(int mouseX, int mouseY, int mouseButton) {
             forEach(Clickable.class).mouseClick(new Point(mouseX, mouseY), mouseButton);
         }
 
@@ -218,7 +217,7 @@ public abstract class AbstractGuiScreen<T extends AbstractGuiScreen<T>> extends 
         }
 
         @Override
-        public void handleMouseInput() throws IOException {
+        public void handleMouseInput() {
             super.handleMouseInput();
             if (Mouse.hasWheel() && Mouse.getEventDWheel() != 0) {
                 forEach(Scrollable.class).scroll(MouseUtils.getMousePos(), Mouse.getEventDWheel());
