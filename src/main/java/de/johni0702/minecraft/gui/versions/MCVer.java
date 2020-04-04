@@ -9,13 +9,13 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.util.crash.CrashReportSection;
 import org.lwjgl.opengl.GL11;
 
-//#if MC>=11400
+//#if FABRIC>=1
 //#else
 //$$ import net.minecraftforge.client.event.GuiScreenEvent;
 //$$ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 //#endif
 
-//#if MC>=11300
+//#if MC>=11400
 import net.minecraft.client.util.Window;
 import org.lwjgl.glfw.GLFW;
 //#else
@@ -44,9 +44,13 @@ public class MCVer {
         return MinecraftClient.getInstance();
     }
 
-    //#if MC>=11300
+    //#if MC>=11400
     public static Window newScaledResolution(MinecraftClient mc) {
+        //#if MC>=11500
+        //$$ return mc.getWindow();
+        //#else
         return mc.window;
+        //#endif
     }
     //#else
     //$$ public static ScaledResolution newScaledResolution(Minecraft mc) {
@@ -77,7 +81,7 @@ public class MCVer {
         //$$ Tessellator tessellator = Tessellator.instance;
         //#endif
         //#if MC>=10904
-        BufferBuilder vertexBuffer = tessellator.getBufferBuilder();
+        BufferBuilder vertexBuffer = tessellator.getBuffer();
         //#else
         //#if MC>=10800
         //$$ WorldRenderer vertexBuffer = tessellator.getWorldRenderer();
@@ -134,7 +138,7 @@ public class MCVer {
     public static void drawRect(int x, int y, int width, int height, ReadableColor tl, ReadableColor tr, ReadableColor bl, ReadableColor br) {
         //#if MC>=10800
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder vertexBuffer = tessellator.getBufferBuilder();
+        BufferBuilder vertexBuffer = tessellator.getBuffer();
         //#else
         //$$ Tessellator tessellator = Tessellator.instance;
         //$$ Tessellator vertexBuffer = tessellator;
@@ -163,7 +167,7 @@ public class MCVer {
         return getMinecraft().textRenderer;
     }
 
-    //#if MC<11400
+    //#if FABRIC<=0
     //$$ public static RenderGameOverlayEvent.ElementType getType(RenderGameOverlayEvent.Post event) {
         //#if MC>=10904
         //$$ return event.getType();
@@ -206,7 +210,7 @@ public class MCVer {
     //#endif
 
     public static void setClipboardString(String text) {
-        //#if MC>=11300
+        //#if MC>=11400
         getMinecraft().keyboard.setClipboard(text);
         //#else
         //$$ GuiScreen.setClipboardString(text);
@@ -214,7 +218,7 @@ public class MCVer {
     }
 
     public static String getClipboardString() {
-        //#if MC>=11300
+        //#if MC>=11400
         return getMinecraft().keyboard.getClipboard();
         //#else
         //$$ return GuiScreen.getClipboardString();
@@ -237,7 +241,7 @@ public class MCVer {
     //$$ public static void colorLogicOp(int op) { GL11.glLogicOp(op); }
     //#endif
 
-    //#if MC>=11300
+    //#if MC>=11400
     public static abstract class Keyboard {
         public static final int KEY_ESCAPE = GLFW.GLFW_KEY_ESCAPE;
         public static final int KEY_HOME = GLFW.GLFW_KEY_HOME;

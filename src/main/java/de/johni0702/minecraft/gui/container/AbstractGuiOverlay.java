@@ -42,33 +42,39 @@ import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.crash.CrashException;
 
-//#if MC>=11300
+//#if MC>=11400
+import de.johni0702.minecraft.gui.versions.callbacks.PreTickCallback;
+import net.minecraft.text.LiteralText;
+//#endif
+
+//#if MC>=11400
 import net.minecraft.client.util.Window;
 //#else
 //$$ import org.lwjgl.input.Mouse;
 //$$ import net.minecraft.client.gui.ScaledResolution;
 //#endif
 
-//#if MC>=11400
+//#if FABRIC>=1
 import de.johni0702.minecraft.gui.versions.callbacks.PostRenderHudCallback;
-import de.johni0702.minecraft.gui.versions.callbacks.PreTickCallback;
-import net.minecraft.text.LiteralText;
 //#else
 //$$ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 //#if MC>=10800
-//#if MC>=11300
+//#if MC>=11400
 //$$ import net.minecraftforge.eventbus.api.SubscribeEvent;
 //#else
 //$$ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 //#endif
+//#if MC>=11400
+//#else
 //$$ import net.minecraftforge.fml.common.gameevent.TickEvent;
+//#endif
 //#else
 //$$ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 //$$ import cpw.mods.fml.common.gameevent.TickEvent;
 //#endif
 //#endif
 
-//#if MC>=10800 && MC<11300
+//#if MC>=10800 && MC<11400
 //$$ import java.io.IOException;
 //#endif
 
@@ -223,7 +229,7 @@ public abstract class AbstractGuiOverlay<T extends AbstractGuiOverlay<T>> extend
 
         private EventHandler() {}
 
-        //#if MC>=11400
+        //#if FABRIC>=1
         { on(PostRenderHudCallback.EVENT, this::renderOverlay); }
         private void renderOverlay(float partialTicks) {
         //#else
@@ -262,7 +268,7 @@ public abstract class AbstractGuiOverlay<T extends AbstractGuiOverlay<T>> extend
 
         private void updateRenderer() {
             MinecraftClient mc = getMinecraft();
-            //#if MC>=11300
+            //#if MC>=11400
             Window
             //#else
             //$$ ScaledResolution
@@ -289,7 +295,7 @@ public abstract class AbstractGuiOverlay<T extends AbstractGuiOverlay<T>> extend
             this.passEvents = true;
         }
 
-        //#if MC>=11300
+        //#if MC>=11400
         @Override
         public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
             if (!forEach(Typeable.class).typeKey(MouseUtils.getMousePos(), keyCode, '\0', hasControlDown(), hasShiftDown())) {
@@ -320,7 +326,7 @@ public abstract class AbstractGuiOverlay<T extends AbstractGuiOverlay<T>> extend
         //#endif
 
         @Override
-        //#if MC>=11300
+        //#if MC>=11400
         public boolean mouseClicked(double mouseXD, double mouseYD, int mouseButton) {
             int mouseX = (int) Math.round(mouseXD), mouseY = (int) Math.round(mouseYD);
             return
@@ -335,7 +341,7 @@ public abstract class AbstractGuiOverlay<T extends AbstractGuiOverlay<T>> extend
         }
 
         @Override
-        //#if MC>=11300
+        //#if MC>=11400
         public boolean mouseReleased(double mouseXD, double mouseYD, int mouseButton) {
             int mouseX = (int) Math.round(mouseXD), mouseY = (int) Math.round(mouseYD);
             return
@@ -346,7 +352,7 @@ public abstract class AbstractGuiOverlay<T extends AbstractGuiOverlay<T>> extend
         }
 
         @Override
-        //#if MC>=11300
+        //#if MC>=11400
         public boolean mouseDragged(double mouseXD, double mouseYD, int mouseButton, double deltaX, double deltaY) {
             int mouseX = (int) Math.round(mouseXD), mouseY = (int) Math.round(mouseYD);
             long timeSinceLastClick = 0;
@@ -358,7 +364,7 @@ public abstract class AbstractGuiOverlay<T extends AbstractGuiOverlay<T>> extend
         }
 
         @Override
-        //#if MC>=11300
+        //#if MC>=11400
         public void tick() {
         //#else
         //$$ public void updateScreen() {
@@ -366,7 +372,7 @@ public abstract class AbstractGuiOverlay<T extends AbstractGuiOverlay<T>> extend
             forEach(Tickable.class).tick();
         }
 
-        //#if MC>=11300
+        //#if MC>=11400
         @Override
         public boolean mouseScrolled(
                 //#if MC>=11400
